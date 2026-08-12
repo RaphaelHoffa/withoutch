@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-web
+  namespace: default
+  labels:
+    app: todo
+    component: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: todo
+      component: web
+  template:
+    metadata:
+      labels:
+        app: todo
+        component: web
+    spec:
+      containers:
+        - name: web
+          image: python:3.11-slim
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:postgres@todo-db:5432/todos
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: todo-secrets
+                  key: secret-key
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-web
+  namespace: default
+spec:
+  selector:
+    app: todo
+    component: web
+  ports:
+    - port: 80
+      targetPort: 8000
+  type: ClusterIP
