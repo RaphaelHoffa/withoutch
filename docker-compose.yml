@@ -3,27 +3,37 @@ services:
   web:
     build:
       context: ./app
+      args:
+        - IDENTITY_ID=${IDENTITY_ID}
+        - CHAINGUARD_PYTHON_TOKEN=${CHAINGUARD_PYTHON_TOKEN}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - SECRET_KEY=${SECRET_KEY}
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/todos
-      SECRET_KEY: not-so-secret
+
     depends_on:
       - db
     volumes:
       - ./app:/app
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
 
   db:
     image: postgres:15
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: todos
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
