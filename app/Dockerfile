@@ -1,8 +1,8 @@
 #### BUILD STAGE ####
 
 FROM cgr.dev/chainguard/python:latest-dev AS build
-ARG ${IDENTITY_ID}
-ARG ${CHAINGUARD_PYTHON_TOKEN}
+ARG IDENTITY_ID
+ARG CHAINGUARD_PYTHON_TOKEN
 
 WORKDIR /app
 
